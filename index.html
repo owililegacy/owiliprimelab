@@ -202,6 +202,17 @@
             outline: none;
             border-color: #2563EB;
         }
+
+        select.skeuo-input {
+            background-color: #0f172a;
+            background-image: linear-gradient(145deg, #0f172a, #1e293b);
+            
+        }
+
+        select.skeuo-input option {
+            background-color: #1e293b;
+            
+        }
         
         /* Device Mockup */
         .device-frame {
@@ -692,7 +703,7 @@
                             <div class="flex items-center gap-4">
                                 <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-cyan-400 flex items-center justify-center text-white font-bold">AK</div>
                                 <div>
-                                    <div class="font-semibold text-white">Alex Kim</div>
+                                    <div class="font-semibold text-white">Eric Miring'u</div>
                                     <div class="text-xs text-gray-500">HR Director, MediCare</div>
                                 </div>
                             </div>
@@ -1028,6 +1039,12 @@
                     </div>
                     <div class="liquid-glass rounded-xl p-6 text-center">
                         <i class="fas fa-microchip text-3xl text-purple-400 mb-3"></i>
+                        <h4 class="font-semibold mb-2">Information Technology</h4>
+                        <p class="text-xs text-gray-400">General IT roles and projects</p>
+                    </div>
+
+                    <div class="liquid-glass rounded-xl p-6 text-center">
+                        <i class="fas fa-microchip text-3xl text-purple-400 mb-3"></i>
                         <h4 class="font-semibold mb-2">Embedded Systems</h4>
                         <p class="text-xs text-gray-400">Perfect for ECE students. IoT and hardware integration</p>
                     </div>
@@ -1068,13 +1085,15 @@
                         <div class="grid md:grid-cols-2 gap-6">
                             <div class="space-y-2">
                                 <label class="text-sm font-medium text-gray-300">Course/Major *</label>
-                                <input type="text" name="course" required class="skeuo-input w-full px-4 py-3 rounded-xl" placeholder="BSc. Computer Science">
-                                <option value="" disabled selected>Select Course</option>
-                                    <option value="2">BSc. Computer Science</option>
-                                    <option value="3">BSc. Software Engineering</option>
-                                    <option value="4">BSc. Data Analysis</option>
-                                    <option value="3">BSc. Business Information Tech</option>
-                                    <option value="4">BSc. Information Technology</option>
+                                <select name="course" required class="skeuo-input w-full px-4 py-3 rounded-xl appearance-none cursor-pointer">
+                                    <option value="" disabled selected>Select Course/Major</option>
+                                    <option value="BSc. Computer Science">BSc. Computer Science</option>
+                                    <option value="BSc. Software Engineering">BSc. Software Engineering</option>
+                                    <option value="BSc. Information Technology">BSc. Information Technology</option>
+                                    <option value="BSc. Cybersecurity">BSc. Cybersecurity</option>
+                                    <option value="BSc. Data Science">BSc. Data Science</option>
+                                    <option value="BSc. Artificial Intelligence">BSc. Artificial Intelligence</option>
+                                </select>
                             </div>
                             <div class="space-y-2">
                                 <label class="text-sm font-medium text-gray-300">Year of Study *</label>
@@ -1124,7 +1143,7 @@
                         </div>
                         
                         <div class="space-y-2">
-                            <label class="text-sm font-medium text-gray-300">Why do you want to join PrimeLabs? *</label>
+                            <label class="text-sm font-medium text-gray-300">Why do you want to join OwiliPrimeLabs? *</label>
                             <textarea name="motivation" required rows="4" class="skeuo-input w-full px-4 py-3 rounded-xl resize-none" placeholder="Tell us about your goals and what you hope to learn..."></textarea>
                         </div>
                         
@@ -1135,7 +1154,7 @@
                         
                         <p class="text-xs text-center text-gray-500">
                             <i class="fas fa-lock mr-1"></i>
-                            Applications are reviewed by our engineering team. Response within 5 business days.
+                            Applications are reviewed by our engineering team. Response within 3 business days.
                         </p>
                     </form>
                     
@@ -1163,7 +1182,7 @@
                             <div class="w-8 h-8 rounded-lg metallic-surface flex items-center justify-center">
                                 <i class="fas fa-atom text-blue-400"></i>
                             </div>
-                            <span class="font-space font-bold text-xl embossed-text">PrimeLabs</span>
+                            <span class="font-space font-bold text-xl embossed-text">OwiliPrimeLabs</span>
                         </div>
                         <p class="text-gray-400 text-sm max-w-sm">
                             Elite software engineering studio building AI-powered, enterprise-grade digital systems for the future.
