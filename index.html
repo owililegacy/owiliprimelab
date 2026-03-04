@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owili Prime Labs  | Engineering Digital Power</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'space': ['Space Grotesk', 'sans-serif'],
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        prime: {
+                            navy: '#0F172A',
+                            blue: '#2563EB',
+                            cyan: '#06B6D4',
+                            dark: '#020617',
+                            glass: 'rgba(255, 255, 255, 0.1)',
+                        }
+                    },
+                    boxShadow: {
+                        'skeuo': '20px 20px 60px #0a0f1f, -20px -20px 60px #141f3b',
+                        'skeuo-inset': 'inset 5px 5px 10px #0a0f1f, inset -5px -5px 10px #141f3b',
+                        'metallic': '0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)',
+                        'liquid': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #0F172A 0%, #020617 50%, #1e293b 100%);
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        
+        /* Skeuomorphic Embossed Text */
+        .embossed-text {
+            background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0px 2px 4px rgba(0,0,0,0.5);
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+        }
+        
+        .metallic-surface {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            box-shadow: 
+                20px 20px 60px #0a0f1f, 
+                -20px -20px 60px #141f3b,
+                inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+        
+        .skeuo-button {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            box-shadow: 
+                5px 5px 10px #0a0f1f, 
+                -5px -5px 10px #141f3b;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .skeuo-button:hover {
+            box-shadow: 
+                8px 8px 16px #0a0f1f, 
+                -8px -8px 16px #141f3b;
+            transform: translateY(-2px);
+        }
+        
+        .skeuo-button:active {
+            box-shadow: 
+                inset 4px 4px 8px #0a0f1f, 
+                inset -4px -4px 8px #141f3b;
+            transform: translateY(0);
+        }
+        
+        .skeuo-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+        
+        .skeuo-button:hover::before {
+            left: 100%;
+        }
+        
+        /* Liquid Glass Effect */
+        .liquid-glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 
+                0 8px 32px 0 rgba(31, 38, 135, 0.37),
+                inset 0 4px 20px rgba(255, 255, 255, 0.05);
+        }
+        
+        .liquid-glass-strong {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px) saturate(200%);
+            -webkit-backdrop-filter: blur(20px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 
+                0 8px 32px 0 rgba(31, 38, 135, 0.5),
+                inset 0 4px 20px rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Glass Card with Reflection */
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: transform 0.1s;
+        }
+        
+        .glass-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .glass-card:hover::after {
+            opacity: 1;
+        }
+        
+        /* 3D Floating Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotateX(0deg); }
+            50% { transform: translateY(-20px) rotateX(2deg); }
+        }
+        
+        .float-anim {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* Blob Animation */
+        @keyframes blob {
+            0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+            50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+        }
+        
+        .blob {
+            animation: blob 8s ease-in-out infinite;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0F172A;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2563EB;
+            border-radius: 5px;
+        }
+        
+        /* Form Styling */
+        .skeuo-input {
+            background: linear-gradient(145deg, #0f172a, #1e293b);
+            box-shadow: 
+                inset 3px 3px 6px #0a0f1f, 
+                inset -3px -3px 6px #141f3b;
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        .skeuo-input:focus {
+            box-shadow: 
+                inset 5px 5px 10px #0a0f1f, 
+                inset -5px -5px 10px #141f3b,
+                0 0 0 2px rgba(37, 99, 235, 0.5);
+            outline: none;
+            border-color: #2563EB;
+        }
+        
+        /* Device Mockup */
+        .device-frame {
+            background: #000;
+            border-radius: 20px;
+            padding: 10px;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 0, 0, 0.8),
+                0 0 0 1px rgba(255,255,255,0.1);
+            position: relative;
+        }
+        
+        .device-screen {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Navigation Glass */
+        .nav-glass {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        /* Grid Pattern Background */
+        .grid-pattern {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+        
+        /* Shimmer Effect */
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            background-size: 200% 100%;
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        
+        /* Page Transition */
+        .page-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .page-section.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Three.js Canvas */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Marquee Animation */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .marquee-track {
+            animation: marquee 30s linear infinite;
+        }
+        .marquee-track:hover {
+            animation-play-state: paused;
+        }
+
+        /* Tech Stack Hover */
+        .tech-icon {
+            transition: all 0.3s ease;
+        }
+        .tech-icon:hover {
+            transform: translateY(-5px) scale(1.1);
+            filter: drop-shadow(0 0 10px rgba(37, 99, 235, 0.5));
+        }
+    </style>
+</head>
+<body class="font-inter antialiased selection:bg-blue-500 selection:text-white">
+
+    <!-- Three.js Background -->
+    <div id="canvas-container"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 nav-glass transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="showSection('home')">
+                    <div class="w-10 h-10 rounded-lg metallic-surface flex items-center justify-center">
+                        <i class="fas fa-atom text-blue-400 text-xl"></i>
+                    </div>
+                    <span class="font-space font-bold text-2xl tracking-tight embossed-text">OwiliPrimeLabs</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <button onclick="showSection('home')" class="nav-link text-gray-300 hover:text-white transition-colors font-medium">Home</button>
+                    <button onclick="showSection('services')" class="nav-link text-gray-300 hover:text-white transition-colors font-medium">Services</button>
+                    <button onclick="showSection('projects')" class="nav-link text-gray-300 hover:text-white transition-colors font-medium">Projects</button>
+                    <button onclick="showSection('attachment')" class="nav-link px-4 py-2 rounded-lg liquid-glass text-white hover:bg-white/20 transition-all font-medium">
+                        Attachment Program
+                    </button>
+                    <button onclick="scrollToContact()" class="skeuo-button px-6 py-3 rounded-lg text-white font-semibold flex items-center gap-2">
+                        <span>Start Project</span>
+                        <i class="fas fa-bolt text-yellow-400"></i>
+                    </button>
+                </div>
+                
+                <button class="md:hidden text-white text-2xl" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden liquid-glass-strong border-t border-white/10">
+            <div class="px-4 pt-2 pb-6 space-y-2">
+                <button onclick="showSection('home')" class="block w-full text-left px-3 py-2 text-gray-300 hover:text-white">Home</button>
+                <button onclick="showSection('services')" class="block w-full text-left px-3 py-2 text-gray-300 hover:text-white">Services</button>
+                <button onclick="showSection('projects')" class="block w-full text-left px-3 py-2 text-gray-300 hover:text-white">Projects</button>
+                <button onclick="showSection('attachment')" class="block w-full text-left px-3 py-2 text-blue-400 font-semibold">Attachment Program</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Container -->
+    <main class="relative z-10 pt-20">
+        
+        <!-- HOME SECTION - EXTENDED -->
+        <section id="home-section" class="page-section active">
+            <!-- Hero -->
+            <div class="min-h-screen flex items-center relative overflow-hidden">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 w-full">
+                    <div class="grid lg:grid-cols-2 gap-12 items-center">
+                        <!-- Left Content -->
+                        <div class="space-y-8 relative z-20">
+                            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full liquid-glass text-sm font-medium text-blue-300 mb-4">
+                                <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+                                Now Accepting Attachment Applications
+                            </div>
+                            
+                            <h1 class="font-space font-bold text-5xl md:text-7xl leading-tight">
+                                <span class="embossed-text block">Engineering</span>
+                                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Digital Power.</span>
+                            </h1>
+                            
+                            <p class="text-xl text-gray-400 max-w-lg leading-relaxed">
+                                AI Systems. Enterprise Platforms. Scalable Software Infrastructure. 
+                                Built by engineers, designed for scale.
+                            </p>
+                            
+                            <div class="flex flex-wrap gap-4">
+                                <button onclick="scrollToContact()" class="skeuo-button px-8 py-4 rounded-xl text-white font-semibold text-lg flex items-center gap-3 group">
+                                    <span>Start a Project</span>
+                                    <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                                </button>
+                                <button onclick="showSection('attachment')" class="liquid-glass px-8 py-4 rounded-xl text-white font-semibold text-lg hover:bg-white/10 transition-all flex items-center gap-3">
+                                    <i class="fas fa-graduation-cap"></i>
+                                    <span>Apply for Attachment</span>
+                                </button>
+                            </div>
+                            
+                            <!-- Trust Indicators -->
+                            <div class="flex items-center gap-6 pt-8 border-t border-white/10">
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-white font-space">99.9%</div>
+                                    <div class="text-xs text-gray-500 uppercase tracking-wider">Uptime</div>
+                                </div>
+                                <div class="w-px h-10 bg-white/10"></div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-white font-space">30+</div>
+                                    <div class="text-xs text-gray-500 uppercase tracking-wider">Projects</div>
+                                </div>
+                                <div class="w-px h-10 bg-white/10"></div>
+                                <div class="text-center">
+                                    <div class="text-2xl font-bold text-white font-space">20+</div>
+                                    <div class="text-xs text-gray-500 uppercase tracking-wider">Engineers</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Content - 3D Elements -->
+                        <div class="relative h-[600px] hidden lg:block">
+                            <!-- Floating UI Panels -->
+                            <div class="absolute top-10 right-10 w-64 h-40 liquid-glass-strong rounded-2xl p-4 float-anim transform rotate-6 z-30">
+                                <div class="flex items-center gap-3 mb-3">
+                                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="h-2 bg-white/20 rounded w-3/4"></div>
+                                    <div class="h-2 bg-white/20 rounded w-1/2"></div>
+                                    <div class="h-2 bg-blue-400/50 rounded w-5/6"></div>
+                                </div>
+                                <div class="mt-4 flex gap-2">
+                                    <div class="px-3 py-1 rounded bg-blue-500/30 text-xs text-blue-200">AI Model</div>
+                                    <div class="px-3 py-1 rounded bg-purple-500/30 text-xs text-purple-200">API</div>
+                                </div>
+                            </div>
+                            
+                            <div class="absolute top-40 left-0 w-56 h-56 metallic-surface rounded-2xl p-6 float-anim transform -rotate-3 z-20 flex flex-col justify-between" style="animation-delay: 1s;">
+                                <div class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-br from-blue-400 to-cyan-300 font-space">24/7</div>
+                                <div>
+                                    <div class="text-sm text-gray-400">System Status</div>
+                                    <div class="flex items-center gap-2 mt-1">
+                                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                        <span class="text-green-400 text-sm font-semibold">Operational</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="absolute bottom-20 right-20 w-72 h-48 liquid-glass rounded-2xl p-5 float-anim transform rotate-3 z-10" style="animation-delay: 2s;">
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-sm font-semibold text-gray-300">Server Load</span>
+                                    <i class="fas fa-server text-blue-400"></i>
+                                </div>
+                                <div class="space-y-3">
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1">
+                                            <span class="text-gray-400">CPU</span>
+                                            <span class="text-blue-400">42%</span>
+                                        </div>
+                                        <div class="h-2 bg-white/10 rounded-full overflow-hidden">
+                                            <div class="h-full w-[42%] bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-xs mb-1">
+                                            <span class="text-gray-400">Memory</span>
+                                            <span class="text-purple-400">68%</span>
+                                        </div>
+                                        <div class="h-2 bg-white/10 rounded-full overflow-hidden">
+                                            <div class="h-full w-[68%] bg-gradient-to-r from-purple-500 to-pink-400 rounded-full"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Decorative Blobs -->
+                            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl blob"></div>
+                            <div class="absolute bottom-0 right-0 w-64 h-64 bg-cyan-500/20 rounded-full blur-3xl blob" style="animation-delay: 2s;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trusted By Section -->
+            <div class="py-20 border-y border-white/5 bg-[#0B1120]/50 relative overflow-hidden">
+                <div class="absolute inset-0 grid-pattern opacity-20"></div>
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-10 text-center relative z-10">
+                    <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-widest mb-2">Trusted By Industry Leaders</h3>
+                    <div class="w-20 h-1 bg-blue-500 mx-auto rounded-full"></div>
+                </div>
+                
+                <div class="relative w-full overflow-hidden">
+                    <div class="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-[#0B1120] to-transparent z-10"></div>
+                    <div class="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-[#0B1120] to-transparent z-10"></div>
+                    
+                    <div class="flex marquee-track whitespace-nowrap">
+                        <div class="flex items-center gap-16 px-8">
+                            <div class="metallic-surface px-8 py-4 rounded-xl flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                                <i class="fas fa-cube text-2xl text-blue-400"></i>
+                                <span class="font-space font-bold text-xl text-gray-300">TechCorp</span>
+                            </div>
+                            <div class="metallic-surface px-8 py-4 rounded-xl flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                                <i class="fas fa-leaf text-2xl text-green-400"></i>
+                                <span class="font-space font-bold text-xl text-gray-300">GreenEnergy</span>
+                            </div>
+                            <div class="metallic-surface px-8 py-4 rounded-xl flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                                <i class="fas fa-heartbeat text-2xl text-red-400"></i>
+                                <span class="font-space font-bold text-xl text-gray-300">MediCare</span>
+                            </div>
+                            <div class="metallic-surface px-8 py-4 rounded-xl flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                                <i class="fas fa-university text-2xl text-yellow-400"></i>
+                                <span class="font-space font-bold text-xl text-gray-300">FinanceHub</span>
+                            </div>
+                            <div class="metallic-surface px-8 py-4 rounded-xl flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                                <i class="fas fa-shopping-cart text-2xl text-purple-400"></i>
+                                <span class="font-space font-bold text-xl text-gray-300">ShopifyMax</span>
+                            </div>
+                            <div class="metallic-surface px-8 py-4 rounded-xl flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                                <i class="fas fa-plane text-2xl text-cyan-400"></i>
+                                <span class="font-space font-bold text-xl text-gray-300">AeroSpace</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-16 px-8">
+                            <div class="metallic-surface px-8 py-4 rounded-xl flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                                <i class="fas fa-cube text-2xl text-blue-400"></i>
+                                <span class="font-space font-bold text-xl text-gray-300">TechCorp</span>
+                            </div>
+                            <div class="metallic-surface px-8 py-4 rounded-xl flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                                <i class="fas fa-leaf text-2xl text-green-400"></i>
+                                <span class="font-space font-bold text-xl text-gray-300">GreenEnergy</span>
+                            </div>
+                            <div class="metallic-surface px-8 py-4 rounded-xl flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                                <i class="fas fa-heartbeat text-2xl text-red-400"></i>
+                                <span class="font-space font-bold text-xl text-gray-300">MediCare</span>
+                            </div>
+                            <div class="metallic-surface px-8 py-4 rounded-xl flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                                <i class="fas fa-university text-2xl text-yellow-400"></i>
+                                <span class="font-space font-bold text-xl text-gray-300">FinanceHub</span>
+                            </div>
+                            <div class="metallic-surface px-8 py-4 rounded-xl flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                                <i class="fas fa-shopping-cart text-2xl text-purple-400"></i>
+                                <span class="font-space font-bold text-xl text-gray-300">ShopifyMax</span>
+                            </div>
+                            <div class="metallic-surface px-8 py-4 rounded-xl flex items-center gap-3 opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+                                <i class="fas fa-plane text-2xl text-cyan-400"></i>
+                                <span class="font-space font-bold text-xl text-gray-300">AeroSpace</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How We Work Section -->
+            <div class="py-24 relative">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-16">
+                        <h2 class="font-space font-bold text-4xl md:text-5xl mb-4 embossed-text">Our Engineering Process</h2>
+                        <p class="text-gray-400 max-w-2xl mx-auto">A battle-tested methodology for delivering enterprise-grade software.</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-4 gap-6 relative">
+                        <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-blue-500/30 to-transparent -translate-y-1/2 z-0"></div>
+
+                        <div class="relative z-10 group">
+                            <div class="metallic-surface rounded-2xl p-6 h-full transform transition-all duration-300 hover:-translate-y-2 border border-white/5">
+                                <div class="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-4 text-blue-400 font-bold text-xl border border-blue-500/30">01</div>
+                                <h3 class="font-space font-bold text-lg mb-2 text-white">Discovery</h3>
+                                <p class="text-gray-400 text-sm">Deep dive into your business logic, user needs, and technical constraints.</p>
+                            </div>
+                        </div>
+
+                        <div class="relative z-10 group">
+                            <div class="metallic-surface rounded-2xl p-6 h-full transform transition-all duration-300 hover:-translate-y-2 border border-white/5">
+                                <div class="w-12 h-12 rounded-full bg-cyan-500/20 flex items-center justify-center mb-4 text-cyan-400 font-bold text-xl border border-cyan-500/30">02</div>
+                                <h3 class="font-space font-bold text-lg mb-2 text-white">Architecture</h3>
+                                <p class="text-gray-400 text-sm">Designing scalable, secure, and resilient system blueprints.</p>
+                            </div>
+                        </div>
+
+                        <div class="relative z-10 group">
+                            <div class="metallic-surface rounded-2xl p-6 h-full transform transition-all duration-300 hover:-translate-y-2 border border-white/5">
+                                <div class="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center mb-4 text-purple-400 font-bold text-xl border border-purple-500/30">03</div>
+                                <h3 class="font-space font-bold text-lg mb-2 text-white">Development</h3>
+                                <p class="text-gray-400 text-sm">Agile sprints with continuous integration and peer reviews.</p>
+                            </div>
+                        </div>
+
+                        <div class="relative z-10 group">
+                            <div class="metallic-surface rounded-2xl p-6 h-full transform transition-all duration-300 hover:-translate-y-2 border border-white/5">
+                                <div class="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center mb-4 text-green-400 font-bold text-xl border border-green-500/30">04</div>
+                                <h3 class="font-space font-bold text-lg mb-2 text-white">Deployment</h3>
+                                <p class="text-gray-400 text-sm">CI/CD automation, monitoring, and 24/7 support post-launch.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tech Stack Section -->
+            <div class="py-24 bg-[#0B1120]/30 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-5"></div>
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                    <div class="text-center mb-16">
+                        <h2 class="font-space font-bold text-4xl md:text-5xl mb-4 embossed-text">Our Tech Stack</h2>
+                        <p class="text-gray-400">We use the right tool for the job. Always.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                        <div class="tech-icon metallic-surface rounded-xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer group">
+                            <i class="fab fa-python text-4xl text-yellow-400 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-sm font-medium text-gray-300">Python</span>
+                        </div>
+                        <div class="tech-icon metallic-surface rounded-xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer group">
+                            <i class="fab fa-js text-4xl text-yellow-300 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-sm font-medium text-gray-300">JavaScript</span>
+                        </div>
+                        <div class="tech-icon metallic-surface rounded-xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer group">
+                            <i class="fab fa-react text-4xl text-cyan-400 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-sm font-medium text-gray-300">React</span>
+                        </div>
+                        <div class="tech-icon metallic-surface rounded-xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer group">
+                            <i class="fab fa-node text-4xl text-green-500 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-sm font-medium text-gray-300">Node.js</span>
+                        </div>
+                        <div class="tech-icon metallic-surface rounded-xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer group">
+                            <i class="fab fa-aws text-4xl text-orange-400 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-sm font-medium text-gray-300">AWS</span>
+                        </div>
+                        <div class="tech-icon metallic-surface rounded-xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer group">
+                            <i class="fab fa-docker text-4xl text-blue-400 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-sm font-medium text-gray-300">Docker</span>
+                        </div>
+                        <div class="tech-icon metallic-surface rounded-xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer group">
+                            <i class="fas fa-database text-4xl text-green-400 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-sm font-medium text-gray-300">PostgreSQL</span>
+                        </div>
+                        <div class="tech-icon metallic-surface rounded-xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer group">
+                            <i class="fab fa-rust text-4xl text-orange-300 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-sm font-medium text-gray-300">Rust</span>
+                        </div>
+                        <div class="tech-icon metallic-surface rounded-xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer group">
+                            <i class="fab fa-golang text-4xl text-cyan-300 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-sm font-medium text-gray-300">Go</span>
+                        </div>
+                        <div class="tech-icon metallic-surface rounded-xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer group">
+                            <i class="fab fa-kubernetes text-4xl text-blue-500 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-sm font-medium text-gray-300">Kubernetes</span>
+                        </div>
+                        <div class="tech-icon metallic-surface rounded-xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer group">
+                            <i class="fas fa-brain text-4xl text-pink-400 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-sm font-medium text-gray-300">TensorFlow</span>
+                        </div>
+                        <div class="tech-icon metallic-surface rounded-xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer group">
+                            <i class="fab fa-git-alt text-4xl text-red-500 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-sm font-medium text-gray-300">Git</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testimonials Section -->
+            <div class="py-24 relative">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-16">
+                        <h2 class="font-space font-bold text-4xl md:text-5xl mb-4 embossed-text">Client Testimonials</h2>
+                        <p class="text-gray-400">Don't just take our word for it.</p>
+                    </div>
+
+                    <div class="grid md:grid-cols-3 gap-8">
+                        <div class="glass-card rounded-2xl p-8 relative">
+                            <div class="absolute -top-4 -left-4 w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-xl">
+                                <i class="fas fa-quote-left"></i>
+                            </div>
+                            <div class="flex items-center gap-1 mb-4 text-yellow-400 text-sm">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                            <p class="text-gray-300 mb-6 italic">"Owili Prime Labs transformed our legacy system into a modern, AI-driven platform. Their attention to detail is unmatched."</p>
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 flex items-center justify-center text-white font-bold">JS</div>
+                                <div>
+                                    <div class="font-semibold text-white">Jack Samwel</div>
+                                    <div class="text-xs text-gray-500">CTO, TechCorp</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card rounded-2xl p-8 relative mt-0 md:mt-8">
+                            <div class="absolute -top-4 -left-4 w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white text-xl">
+                                <i class="fas fa-quote-left"></i>
+                            </div>
+                            <div class="flex items-center gap-1 mb-4 text-yellow-400 text-sm">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                            <p class="text-gray-300 mb-6 italic">"The cybersecurity audit they performed identified vulnerabilities we didn't know existed. Essential partners for any serious business."</p>
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-purple-400 to-pink-400 flex items-center justify-center text-white font-bold">WM</div>
+                                <div>
+                                    <div class="font-semibold text-white">Wambua Mwikya</div>
+                                    <div class="text-xs text-gray-500">Security Lead, FinanceHub</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card rounded-2xl p-8 relative">
+                            <div class="absolute -top-4 -left-4 w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white text-xl">
+                                <i class="fas fa-quote-left"></i>
+                            </div>
+                            <div class="flex items-center gap-1 mb-4 text-yellow-400 text-sm">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                            <p class="text-gray-300 mb-6 italic">"Their student attachment program is incredible. The interns they trained for us were better than many senior developers."</p>
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-green-400 to-cyan-400 flex items-center justify-center text-white font-bold">AK</div>
+                                <div>
+                                    <div class="font-semibold text-white">Alex Kim</div>
+                                    <div class="text-xs text-gray-500">HR Director, MediCare</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Final CTA Section -->
+            <div class="py-24 relative overflow-hidden mb-20">
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent to-blue-900/20"></div>
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-500/10 rounded-full blur-3xl"></div>
+                
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+                    <h2 class="font-space font-bold text-5xl md:text-6xl mb-6 embossed-text">Ready to Build?</h2>
+                    <p class="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">Let's discuss how Owili PrimeLabs can accelerate your digital transformation. No commitment required.</p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button onclick="scrollToContact()" class="skeuo-button px-10 py-5 rounded-2xl text-white font-bold text-xl flex items-center justify-center gap-3 group">
+                            <span>Schedule a Consultation</span>
+                            <i class="fas fa-calendar-check group-hover:scale-110 transition-transform"></i>
+                        </button>
+                        <button onclick="showSection('attachment')" class="liquid-glass px-10 py-5 rounded-2xl text-white font-bold text-xl hover:bg-white/10 transition-all flex items-center justify-center gap-3">
+                            <span>Join Our Team</span>
+                            <i class="fas fa-users"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-12 flex items-center justify-center gap-8 text-gray-500 text-sm">
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-400"></i>
+                            <span>Free Initial Consultation</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-400"></i>
+                            <span>NDA Protected</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <i class="fas fa-check-circle text-green-400"></i>
+                            <span>24h Response Time</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SERVICES SECTION - ORIGINAL COMPACT VERSION -->
+        <section id="services-section" class="page-section hidden py-20 relative">
+            <div class="absolute inset-0 grid-pattern opacity-30"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="text-center mb-16">
+                    <h2 class="font-space font-bold text-4xl md:text-5xl mb-4 embossed-text">Core Services</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">Elite engineering solutions for the modern enterprise. We build systems that scale.</p>
+                </div>
+                
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Service Cards -->
+                    <div class="glass-card rounded-2xl p-8 group cursor-pointer" onmousemove="handleCardMove(event, this)" onmouseleave="resetCard(this)">
+                        <div class="w-14 h-14 rounded-xl metallic-surface flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-brain text-2xl text-blue-400"></i>
+                        </div>
+                        <h3 class="font-space font-bold text-xl mb-3 text-white">AI & Automation</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Intelligent systems that learn and adapt. From LLM integration to predictive analytics.</p>
+                        <div class="mt-6 flex items-center text-blue-400 text-sm font-semibold gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span></span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card rounded-2xl p-8 group cursor-pointer" onmousemove="handleCardMove(event, this)" onmouseleave="resetCard(this)">
+                        <div class="w-14 h-14 rounded-xl metallic-surface flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-mobile-alt text-2xl text-cyan-400"></i>
+                        </div>
+                        <h3 class="font-space font-bold text-xl mb-3 text-white">Web & Mobile</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Cross-platform applications with pixel-perfect execution and native performance.</p>
+                        <div class="mt-6 flex items-center text-cyan-400 text-sm font-semibold gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span></span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card rounded-2xl p-8 group cursor-pointer" onmousemove="handleCardMove(event, this)" onmouseleave="resetCard(this)">
+                        <div class="w-14 h-14 rounded-xl metallic-surface flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-building text-2xl text-purple-400"></i>
+                        </div>
+                        <h3 class="font-space font-bold text-xl mb-3 text-white">Enterprise Systems</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Scalable architecture for mission-critical operations. ERP, CRM, and custom solutions.</p>
+                        <div class="mt-6 flex items-center text-purple-400 text-sm font-semibold gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span></span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card rounded-2xl p-8 group cursor-pointer" onmousemove="handleCardMove(event, this)" onmouseleave="resetCard(this)">
+                        <div class="w-14 h-14 rounded-xl metallic-surface flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-shield-alt text-2xl text-green-400"></i>
+                        </div>
+                        <h3 class="font-space font-bold text-xl mb-3 text-white">Cybersecurity</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Zero-trust architecture, penetration testing, and compliance automation.</p>
+                        <div class="mt-6 flex items-center text-green-400 text-sm font-semibold gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span></span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card rounded-2xl p-8 group cursor-pointer" onmousemove="handleCardMove(event, this)" onmouseleave="resetCard(this)">
+                        <div class="w-14 h-14 rounded-xl metallic-surface flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-cloud text-2xl text-orange-400"></i>
+                        </div>
+                        <h3 class="font-space font-bold text-xl mb-3 text-white">Cloud & DevOps</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">Infrastructure as code, CI/CD pipelines, and multi-cloud orchestration.</p>
+                        <div class="mt-6 flex items-center text-orange-400 text-sm font-semibold gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span></span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="glass-card rounded-2xl p-8 group cursor-pointer" onmousemove="handleCardMove(event, this)" onmouseleave="resetCard(this)">
+                        <div class="w-14 h-14 rounded-xl metallic-surface flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-microchip text-2xl text-pink-400"></i>
+                        </div>
+                        <h3 class="font-space font-bold text-xl mb-3 text-white">Embedded Systems</h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">IoT solutions, firmware development, and hardware-software integration.</p>
+                        <div class="mt-6 flex items-center text-pink-400 text-sm font-semibold gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span></span>
+                            <i class="fas fa-arrow-right"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ABOUT SECTION - ORIGINAL COMPACT VERSION -->
+        <section id="about-section" class="page-section hidden py-20 relative overflow-hidden">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-16 items-center">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl blur-3xl opacity-20"></div>
+                        <div class="relative metallic-surface rounded-3xl p-8 md:p-12">
+                            <div class="font-space font-bold text-6xl md:text-8xl text-transparent bg-clip-text bg-gradient-to-br from-white to-gray-600 mb-6">
+                                5+
+                            </div>
+                            <div class="text-2xl font-semibold mb-4">Years of Engineering Excellence</div>
+                            <p class="text-gray-400 leading-relaxed">
+                                Founded by a team of obsessive engineers, Owili Prime Labs has evolved from a dorm-room startup to a trusted partner for Fortune 500 companies.
+                            </p>
+                            
+                            <div class="mt-8 grid grid-cols-2 gap-4">
+                                <div class="liquid-glass rounded-xl p-4 text-center">
+                                    <div class="text-3xl font-bold text-white mb-1">100%</div>
+                                    <div class="text-xs text-gray-400">Remote First</div>
+                                </div>
+                                <div class="liquid-glass rounded-xl p-4 text-center">
+                                    <div class="text-3xl font-bold text-white mb-1">Global</div>
+                                    <div class="text-xs text-gray-400">Delivery</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-8">
+                        <h2 class="font-space font-bold text-4xl md:text-5xl embossed-text">Built by Engineers.<br>Designed for Scale.</h2>
+                        
+                        <div class="space-y-6">
+                            <div class="flex gap-4">
+                                <div class="w-12 h-12 rounded-full liquid-glass flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-code text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-lg mb-2">Engineering-First Culture</h4>
+                                    <p class="text-gray-400 text-sm">We don't outsource. Every line of code is written by a Owili Prime Labs engineer.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-4">
+                                <div class="w-12 h-12 rounded-full liquid-glass flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-rocket text-cyan-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-lg mb-2">Ship Fast, Ship Right</h4>
+                                    <p class="text-gray-400 text-sm">Agile methodologies optimized for enterprise rigor. No corners cut.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-4">
+                                <div class="w-12 h-12 rounded-full liquid-glass flex items-center justify-center flex-shrink-0">
+                                    <i class="fas fa-users text-purple-400"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-lg mb-2">Talent Development</h4>
+                                    <p class="text-gray-400 text-sm">Our attachment program has trained 100+ engineers now working at top tech firms.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="pt-6 border-t border-white/10">
+                            <p class="text-sm text-gray-500 italic">"We believe software engineering is a craft. Every commit should make the codebase better."</p>
+                            <div class="mt-3 flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400"></div>
+                                <div>
+                                    <div class="font-semibold text-sm">Peter Juma</div>
+                                    <div class="text-xs text-gray-500">Founder & Lead Engineer</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROJECTS SECTION - ORIGINAL COMPACT VERSION -->
+        <section id="projects-section" class="page-section hidden py-20 relative">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="font-space font-bold text-4xl md:text-5xl mb-4 embossed-text">Selected Works</h2>
+                    <p class="text-gray-400">Problem → Solution → Results</p>
+                </div>
+                
+                <div class="space-y-12">
+                    <!-- Project 1 -->
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div class="order-2 md:order-1 space-y-4">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-sm">
+                                <i class="fas fa-brain"></i>
+                                <span>AI/ML</span>
+                            </div>
+                            <h3 class="font-space font-bold text-3xl text-white">Predictive Analytics Platform</h3>
+                            <p class="text-gray-400">Built a real-time ML pipeline processing 10TB daily for a fintech client, reducing fraud detection time by 85%.</p>
+                            <div class="flex gap-3">
+                                <span class="px-3 py-1 rounded bg-white/5 text-xs text-gray-300 border border-white/10">Python</span>
+                                <span class="px-3 py-1 rounded bg-white/5 text-xs text-gray-300 border border-white/10">TensorFlow</span>
+                                <span class="px-3 py-1 rounded bg-white/5 text-xs text-gray-300 border border-white/10">AWS</span>
+                            </div>
+                        </div>
+                        <div class="order-1 md:order-2">
+                            <div class="device-frame transform hover:scale-105 transition-transform duration-500">
+                                <div class="device-screen aspect-video bg-gradient-to-br from-blue-900 to-slate-900 flex items-center justify-center relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80')] bg-cover bg-center opacity-50"></div>
+                                    <div class="relative z-10 text-center">
+                                        <i class="fas fa-chart-line text-6xl text-blue-400 mb-4"></i>
+                                        <div class="text-xl font-bold">FinTech Analytics</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project 2 -->
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <div class="device-frame transform hover:scale-105 transition-transform duration-500">
+                                <div class="device-screen aspect-video bg-gradient-to-br from-purple-900 to-slate-900 flex items-center justify-center relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80')] bg-cover bg-center opacity-50"></div>
+                                    <div class="relative z-10 text-center">
+                                        <i class="fas fa-shield-alt text-6xl text-purple-400 mb-4"></i>
+                                        <div class="text-xl font-bold">SecureComm</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-sm">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Cybersecurity</span>
+                            </div>
+                            <h3 class="font-space font-bold text-3xl text-white">Zero-Trust Architecture</h3>
+                            <p class="text-gray-400">Implemented enterprise-wide zero-trust security for a healthcare provider, achieving HIPAA compliance with 40% cost reduction.</p>
+                            <div class="flex gap-3">
+                                <span class="px-3 py-1 rounded bg-white/5 text-xs text-gray-300 border border-white/10">Rust</span>
+                                <span class="px-3 py-1 rounded bg-white/5 text-xs text-gray-300 border border-white/10">Kubernetes</span>
+                                <span class="px-3 py-1 rounded bg-white/5 text-xs text-gray-300 border border-white/10">Vault</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Project 3 -->
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div class="order-2 md:order-1 space-y-4">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-sm">
+                                <i class="fas fa-cloud"></i>
+                                <span>Cloud</span>
+                            </div>
+                            <h3 class="font-space font-bold text-3xl text-white">Multi-Cloud Orchestration</h3>
+                            <p class="text-gray-400">Designed a cloud-agnostic platform managing 50,000+ nodes across AWS, Azure, and GCP with 99.99% uptime.</p>
+                            <div class="flex gap-3">
+                                <span class="px-3 py-1 rounded bg-white/5 text-xs text-gray-300 border border-white/10">Terraform</span>
+                                <span class="px-3 py-1 rounded bg-white/5 text-xs text-gray-300 border border-white/10">Go</span>
+                                <span class="px-3 py-1 rounded bg-white/5 text-xs text-gray-300 border border-white/10">Prometheus</span>
+                            </div>
+                        </div>
+                        <div class="order-1 md:order-2">
+                            <div class="device-frame transform hover:scale-105 transition-transform duration-500">
+                                <div class="device-screen aspect-video bg-gradient-to-br from-cyan-900 to-slate-900 flex items-center justify-center relative overflow-hidden">
+                                    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80')] bg-cover bg-center opacity-50"></div>
+                                    <div class="relative z-10 text-center">
+                                        <i class="fas fa-cloud text-6xl text-cyan-400 mb-4"></i>
+                                        <div class="text-xl font-bold">CloudMesh</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ATTACHMENT PROGRAM SECTION - ORIGINAL COMPACT VERSION -->
+        <section id="attachment-section" class="page-section hidden py-20 relative min-h-screen">
+            <div class="absolute inset-0 grid-pattern opacity-20"></div>
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="text-center mb-12">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full liquid-glass text-blue-300 text-sm font-semibold mb-6">
+                        <i class="fas fa-graduation-cap"></i>
+                        <span>Student Opportunity</span>
+                    </div>
+                    <h2 class="font-space font-bold text-4xl md:text-5xl mb-4 embossed-text">Industrial Attachment Program</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto text-lg">
+                        Real project experience. Remote & On-site options. 
+                        3-month and 6-month programs available.
+                    </p>
+                </div>
+                
+                <div class="grid md:grid-cols-3 gap-6 mb-12">
+                    <div class="liquid-glass rounded-xl p-6 text-center">
+                        <i class="fas fa-robot text-3xl text-blue-400 mb-3"></i>
+                        <h4 class="font-semibold mb-2">AI & Machine Learning</h4>
+                        <p class="text-xs text-gray-400">Work with LLMs, neural networks, and predictive models</p>
+                    </div>
+                    <div class="liquid-glass rounded-xl p-6 text-center">
+                        <i class="fas fa-code text-3xl text-cyan-400 mb-3"></i>
+                        <h4 class="font-semibold mb-2">Web Development</h4>
+                        <p class="text-xs text-gray-400">Full-stack engineering with modern frameworks</p>
+                    </div>
+                    <div class="liquid-glass rounded-xl p-6 text-center">
+                        <i class="fas fa-microchip text-3xl text-purple-400 mb-3"></i>
+                        <h4 class="font-semibold mb-2">Embedded Systems</h4>
+                        <p class="text-xs text-gray-400">Perfect for ECE students. IoT and hardware integration</p>
+                    </div>
+                </div>
+                
+                <!-- Application Form -->
+                <div class="metallic-surface rounded-3xl p-8 md:p-12 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
+                    
+                    <h3 class="font-space font-bold text-2xl mb-8 flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 text-sm">1</span>
+                        Application Form
+                    </h3>
+                    
+                    <form id="attachmentForm" class="space-y-6" onsubmit="handleFormSubmit(event)">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-300">Full Name *</label>
+                                <input type="text" name="fullName" required class="skeuo-input w-full px-4 py-3 rounded-xl" placeholder="John Doe">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-300">Email *</label>
+                                <input type="email" name="email" required class="skeuo-input w-full px-4 py-3 rounded-xl" placeholder="john@university.edu">
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-300">Phone Number *</label>
+                                <input type="tel" name="phone" required class="skeuo-input w-full px-4 py-3 rounded-xl" placeholder="+254 700 000 000">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-300">University *</label>
+                                <input type="text" name="university" required class="skeuo-input w-full px-4 py-3 rounded-xl" placeholder="University of Nairobi">
+                            </div>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-300">Course/Major *</label>
+                                <input type="text" name="course" required class="skeuo-input w-full px-4 py-3 rounded-xl" placeholder="BSc. Computer Science">
+                                <option value="" disabled selected>Select Course</option>
+                                    <option value="2">BSc. Computer Science</option>
+                                    <option value="3">BSc. Software Engineering</option>
+                                    <option value="4">BSc. Data Analysis</option>
+                                    <option value="3">BSc. Business Information Tech</option>
+                                    <option value="4">BSc. Information Technology</option>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-sm font-medium text-gray-300">Year of Study *</label>
+                                <select name="year" required class="skeuo-input w-full px-4 py-3 rounded-xl appearance-none cursor-pointer">
+                                    <option value="" disabled selected>Select Year</option>
+                                    <option value="2">2nd Year</option>
+                                    <option value="3">3rd Year</option>
+                                    <option value="4">4th Year</option>
+                                    <option value="masters">Masters/Postgrad</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-300">Preferred Track *</label>
+                            <div class="grid grid-cols-3 gap-4">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="track" value="ai" class="hidden peer" required>
+                                    <div class="skeuo-input px-4 py-3 rounded-xl text-center peer-checked:border-blue-500 peer-checked:text-blue-400 transition-all">
+                                        <i class="fas fa-brain mb-1 block"></i>
+                                        <span class="text-sm">AI/ML</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="track" value="web" class="hidden peer">
+                                    <div class="skeuo-input px-4 py-3 rounded-xl text-center peer-checked:border-blue-500 peer-checked:text-blue-400 transition-all">
+                                        <i class="fas fa-code mb-1 block"></i>
+                                        <span class="text-sm">Web Dev</span>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="track" value="embedded" class="hidden peer">
+                                    <div class="skeuo-input px-4 py-3 rounded-xl text-center peer-checked:border-blue-500 peer-checked:text-blue-400 transition-all">
+                                        <i class="fas fa-microchip mb-1 block"></i>
+                                        <span class="text-sm">Embedded</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-300">CV/Resume Upload (PDF) *</label>
+                            <div class="relative">
+                                <input type="file" name="cv" accept=".pdf" required class="skeuo-input w-full px-4 py-3 rounded-xl file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-500/20 file:text-blue-400 hover:file:bg-blue-500/30 cursor-pointer">
+                            </div>
+                            <p class="text-xs text-gray-500">Max 5MB. PDF format only.</p>
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <label class="text-sm font-medium text-gray-300">Why do you want to join PrimeLabs? *</label>
+                            <textarea name="motivation" required rows="4" class="skeuo-input w-full px-4 py-3 rounded-xl resize-none" placeholder="Tell us about your goals and what you hope to learn..."></textarea>
+                        </div>
+                        
+                        <button type="submit" id="submitBtn" class="w-full skeuo-button py-4 rounded-xl text-white font-semibold text-lg flex items-center justify-center gap-3 group">
+                            <span>Submit Application</span>
+                            <i class="fas fa-paper-plane group-hover:translate-x-1 transition-transform"></i>
+                        </button>
+                        
+                        <p class="text-xs text-center text-gray-500">
+                            <i class="fas fa-lock mr-1"></i>
+                            Applications are reviewed by our engineering team. Response within 5 business days.
+                        </p>
+                    </form>
+                    
+                    <!-- Success Message (Hidden by default) -->
+                    <div id="successMessage" class="hidden text-center py-12">
+                        <div class="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
+                            <i class="fas fa-check text-3xl text-green-400"></i>
+                        </div>
+                        <h3 class="font-space font-bold text-2xl mb-2 text-white">Application Received!</h3>
+                        <p class="text-gray-400 mb-6">We've sent a confirmation to your email. Our team will review your application and get back to you soon.</p>
+                        <button onclick="resetForm()" class="liquid-glass px-6 py-3 rounded-lg text-white hover:bg-white/10 transition-all">
+                            Submit Another Application
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="relative z-10 border-t border-white/10 bg-[#0B1120] mt-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="grid md:grid-cols-4 gap-8 mb-8">
+                    <div class="col-span-2">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-8 h-8 rounded-lg metallic-surface flex items-center justify-center">
+                                <i class="fas fa-atom text-blue-400"></i>
+                            </div>
+                            <span class="font-space font-bold text-xl embossed-text">PrimeLabs</span>
+                        </div>
+                        <p class="text-gray-400 text-sm max-w-sm">
+                            Elite software engineering studio building AI-powered, enterprise-grade digital systems for the future.
+                        </p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-4 text-white">Contact</h4>
+                        <ul class="space-y-2 text-sm text-gray-400">
+                            <li class="flex items-center gap-2">
+                                <i class="fas fa-envelope text-blue-400"></i>
+                                owiliprimelabs@gmail.com
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <i class="fas fa-map-marker-alt text-blue-400"></i>
+                                Nairobi, Kenya
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-4 text-white">Links</h4>
+                        <ul class="space-y-2 text-sm text-gray-400">
+                            <li><button onclick="showSection('services')" class="hover:text-white transition-colors">Services</button></li>
+                            <li><button onclick="showSection('projects')" class="hover:text-white transition-colors">Projects</button></li>
+                            <li><button onclick="showSection('attachment')" class="hover:text-white transition-colors">Attachment</button></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p class="text-sm text-gray-500">© 2024 PrimeLabs Software. All rights reserved.</p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full liquid-glass flex items-center justify-center text-gray-400 hover:text-white transition-all hover:scale-110">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full liquid-glass flex items-center justify-center text-gray-400 hover:text-white transition-all hover:scale-110">
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full liquid-glass flex items-center justify-center text-gray-400 hover:text-white transition-all hover:scale-110">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script>
+        // Initialize GSAP
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Three.js Liquid Background
+        let scene, camera, renderer, material, mesh;
+        let mouseX = 0, mouseY = 0;
+        let targetX = 0, targetY = 0;
+        
+        function initThree() {
+            const container = document.getElementById('canvas-container');
+            
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 30;
+            
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            container.appendChild(renderer.domElement);
+            
+            // Create liquid-like geometry
+            const geometry = new THREE.IcosahedronGeometry(10, 4);
+            
+            // Custom shader material for liquid effect
+            material = new THREE.ShaderMaterial({
+                uniforms: {
+                    uTime: { value: 0 },
+                    uMouse: { value: new THREE.Vector2(0, 0) },
+                    uColor1: { value: new THREE.Color('#2563EB') },
+                    uColor2: { value: new THREE.Color('#06B6D4') }
+                },
+                vertexShader: `
+                    uniform float uTime;
+                    uniform vec2 uMouse;
+                    varying vec2 vUv;
+                    varying float vDisplacement;
+                    
+                    void main() {
+                        vUv = uv;
+                        vec3 pos = position;
+                        
+                        float dist = distance(uv, uMouse);
+                        float wave = sin(pos.x * 0.5 + uTime) * 0.5 + cos(pos.y * 0.5 + uTime) * 0.5;
+                        float mouseEffect = smoothstep(0.5, 0.0, dist) * 2.0;
+                        
+                        pos.z += wave + mouseEffect;
+                        vDisplacement = wave;
+                        
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform vec3 uColor1;
+                    uniform vec3 uColor2;
+                    uniform float uTime;
+                    varying vec2 vUv;
+                    varying float vDisplacement;
+                    
+                    void main() {
+                        float mixStrength = (vDisplacement + 1.0) * 0.5;
+                        vec3 color = mix(uColor1, uColor2, mixStrength);
+                        
+                        // Add glass-like transparency
+                        float alpha = 0.15 + mixStrength * 0.1;
+                        
+                        gl_FragColor = vec4(color, alpha);
+                    }
+                `,
+                transparent: true,
+                side: THREE.DoubleSide
+            });
+            
+            mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+            
+            // Add second blob
+            const geometry2 = new THREE.IcosahedronGeometry(8, 3);
+            const mesh2 = new THREE.Mesh(geometry2, material.clone());
+            mesh2.position.set(15, -10, -5);
+            mesh2.rotation.z = Math.PI / 4;
+            scene.add(mesh2);
+            
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                material.uniforms.uTime.value += 0.01;
+                
+                // Smooth mouse follow
+                targetX += (mouseX - targetX) * 0.05;
+                targetY += (mouseY - targetY) * 0.05;
+                
+                material.uniforms.uMouse.value.set(targetX, targetY);
+                
+                mesh.rotation.x += 0.001;
+                mesh.rotation.y += 0.002;
+                
+                renderer.render(scene, camera);
+            }
+            animate();
+            
+            // Handle resize
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+            
+            // Mouse move
+            document.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+                mouseY = -(e.clientY / window.innerHeight) * 2 + 1;
+            });
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            initThree();
+            
+            // Initial animation
+            gsap.from("#home-section .space-y-8 > *", {
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                stagger: 0.2,
+                ease: "power3.out"
+            });
+
+            // Animate new home sections on scroll
+            gsap.utils.toArray('.tech-icon').forEach((icon, i) => {
+                gsap.from(icon, {
+                    scrollTrigger: {
+                        trigger: icon,
+                        start: "top 85%",
+                    },
+                    y: 30,
+                    opacity: 0,
+                    duration: 0.5,
+                    delay: i * 0.05,
+                    ease: "back.out(1.7)"
+                });
+            });
+        });
+        
+        // Navigation and Section Management
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+                setTimeout(() => {
+                    if (!section.classList.contains('active')) {
+                        section.classList.add('hidden');
+                    }
+                }, 600);
+            });
+            
+            // Show target section
+            const target = document.getElementById(sectionName + '-section');
+            if (target) {
+                target.classList.remove('hidden');
+                // Small delay to allow display:block to apply before adding opacity class
+                setTimeout(() => {
+                    target.classList.add('active');
+                    
+                    // Scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    
+                    // Animate content
+                    gsap.from(target.querySelectorAll('h2, h3, .glass-card, .metallic-surface, .liquid-glass'), {
+                        y: 30,
+                        opacity: 0,
+                        duration: 0.8,
+                        stagger: 0.1,
+                        ease: "power3.out"
+                    });
+                }, 50);
+            }
+            
+            // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
+            
+            // Update nav active state
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('text-blue-400');
+            });
+        }
+        
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+        
+        function scrollToContact() {
+            // In a real app, this would scroll to a contact section
+            // For now, let's just alert or show a modal concept
+            alert("Contact form would open here - Email: owiliprimelabs@gmail.com");
+        }
+        
+        // 3D Card Tilt Effect
+        function handleCardMove(e, card) {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = (y - centerY) / 10;
+            const rotateY = (centerX - x) / 10;
+            
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+            
+            // Update reflection position
+            const after = card.querySelector('::after') || card;
+            card.style.setProperty('--mouse-x', x + 'px');
+            card.style.setProperty('--mouse-y', y + 'px');
+        }
+        
+        function resetCard(card) {
+            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+        }
+        
+        // Form Handling
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('submitBtn');
+            const originalContent = btn.innerHTML;
+            
+            // Loading state
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending Application...';
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Hide form, show success
+                document.getElementById('attachmentForm').classList.add('hidden');
+                document.getElementById('successMessage').classList.remove('hidden');
+                
+                // Reset button
+                btn.disabled = false;
+                btn.innerHTML = originalContent;
+                
+                // In production, this would send to:
+                // Email: owiliprimelabs@gmail.com
+                // Using: EmailJS, Formspree, or custom Node.js API with Nodemailer
+                console.log('Application submitted to owiliprimelabs@gmail.com');
+                
+            }, 2000);
+        }
+        
+        function resetForm() {
+            document.getElementById('attachmentForm').reset();
+            document.getElementById('attachmentForm').classList.remove('hidden');
+            document.getElementById('successMessage').classList.add('hidden');
+        }
+        
+        // Navbar scroll effect
+        let lastScroll = 0;
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            const currentScroll = window.pageYOffset;
+            
+            if (currentScroll > 100) {
+                navbar.classList.add('shadow-lg');
+            } else {
+                navbar.classList.remove('shadow-lg');
+            }
+            
+            lastScroll = currentScroll;
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
